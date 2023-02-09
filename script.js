@@ -82,11 +82,11 @@ const displayTransfers = function (movements) {
 // displayTransfers(account1.movements);
 
 //function to calculater total balance and display it
-const calcAndPrintBalance = function (movements) {
-  const balance = movements.reduce(function (total, val) {
+const calcAndPrintBalance = function (acc) {
+  acc.balance = acc.movements.reduce(function (total, val) {
     return total + val;
   }, 0);
-  labelBalance.textContent = `${balance}euro`;
+  labelBalance.textContent = `${acc.balance}euro`;
 };
 
 // calcAndPrintBalance(account1.movements);
@@ -128,13 +128,23 @@ generateUsername(accounts);
 
 console.log(accounts);
 
+const updateUi = function (acc) {
+  //Display movements
+  displayTransfers(acc.movements);
+  //Display balance
+  calcAndPrintBalance(acc);
+  //Display summary
+  displaySummary(acc);
+};
+
 //login function
+let currentAccount;
 
 btnLogin.addEventListener('click', function (e) {
   e.preventDefault();
   console.log('dddddddddddddddddddddddddddd');
 
-  const currentAccount = accounts.find(
+  currentAccount = accounts.find(
     acc => acc.usernme === inputLoginUsername.value
   );
   console.log(currentAccount);
@@ -148,15 +158,30 @@ btnLogin.addEventListener('click', function (e) {
     //removing login details
     inputLoginPin.value = inputLoginUsername.value = '';
     inputLoginPin.blur();
-    //Display movements
-    displayTransfers(currentAccount.movements);
-    //Display balance
-    calcAndPrintBalance(currentAccount.movements);
-    //Display summary
-    displaySummary(currentAccount);
+
+    updateUi(currentAccount);
   }
 });
 
-// btnTransfer.addEventListener('click', function () {
-//   const amount = inputLoanAmount.value;
-// });
+btnTransfer.addEventListener('click', function (e) {
+  e.preventDefault();
+  const amount = Number(inputTransferAmount.value);
+  const sendto = accounts.find(acc => acc.usernme === inputTransferTo.value);
+  console.log(amount, sendto);
+
+  inputTransferAmount.value = inputTransferTo.value = '';
+  if (
+    sendto &&
+    amount > 0 &&
+    currentAccount.balance > amount &&
+    sendto?.usernme !== currentAccount.usernme
+  ) {
+    //doing the trasfer
+    sendto.movements.push(amount);
+    currentAccount.movements.push(-1 * amount);
+    console.log(accounts);
+
+    //updating the UI
+    updateUi(currentAccount);
+  }
+});
