@@ -79,7 +79,7 @@ const displayTransfers = function (movements) {
   });
 };
 
-displayTransfers(account1.movements);
+// displayTransfers(account1.movements);
 
 //function to calculater total balance and display it
 const calcAndPrintBalance = function (movements) {
@@ -89,7 +89,27 @@ const calcAndPrintBalance = function (movements) {
   labelBalance.textContent = `${balance}euro`;
 };
 
-calcAndPrintBalance(account1.movements);
+// calcAndPrintBalance(account1.movements);
+
+const displaySummary = function (acc) {
+  const income = acc.movements
+    .filter(mov => mov > 0)
+    .reduce((acc, val) => acc + val);
+  labelSumIn.textContent = income;
+  const outcome = acc.movements
+    .filter(mov => mov < 0)
+    .reduce((acc, val) => acc + val);
+  labelSumOut.textContent = `${Math.abs(outcome)}`;
+  //1.2% interst rate for every deposit and giving it if its larger than 1
+  const interest = acc.movements
+    .filter(mov => mov > 0)
+    .map(val => (val * acc.interestRate) / 100)
+    .filter(int => int > 1)
+    .reduce((total, int) => total + int);
+  labelSumInterest.textContent = `${Math.abs(interest)}`;
+};
+
+// displaySummary(account1.movements);
 
 //function to generate a usernam from the full name
 //How to mutate????
@@ -107,3 +127,36 @@ const generateUsername = function (accnts) {
 generateUsername(accounts);
 
 console.log(accounts);
+
+//login function
+
+btnLogin.addEventListener('click', function (e) {
+  e.preventDefault();
+  console.log('dddddddddddddddddddddddddddd');
+
+  const currentAccount = accounts.find(
+    acc => acc.usernme === inputLoginUsername.value
+  );
+  console.log(currentAccount);
+  console.log(inputLoginPin.value);
+  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+    console.log('Login');
+    //Display UI and welcome
+    containerApp.style.opacity = 100;
+    // console.log(currentAccount.owner.split(' ')[]);
+    labelWelcome.textContent = `Welcome ${currentAccount.owner.split(' ')[0]}!`;
+    //removing login details
+    inputLoginPin.value = inputLoginUsername.value = '';
+    inputLoginPin.blur();
+    //Display movements
+    displayTransfers(currentAccount.movements);
+    //Display balance
+    calcAndPrintBalance(currentAccount.movements);
+    //Display summary
+    displaySummary(currentAccount);
+  }
+});
+
+// btnTransfer.addEventListener('click', function () {
+//   const amount = inputLoanAmount.value;
+// });
