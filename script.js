@@ -62,9 +62,12 @@ const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
 //funcion to display all the transfers
-const displayTransfers = function (movements) {
+const displayTransfers = function (movements, sort = false) {
   containerMovements.innerHTML = '';
-  movements.forEach(function (mov, i) {
+
+  const movs = sort ? movements.slice().sort((a, b) => a - b) : movements;
+
+  movs.forEach(function (mov, i) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
     const movElement = `
     <div class="movements__row">
@@ -186,6 +189,22 @@ btnTransfer.addEventListener('click', function (e) {
   }
 });
 
+//loan function
+btnLoan.addEventListener('click', function (e) {
+  e.preventDefault();
+  const amount = Number(inputLoanAmount.value);
+  if (
+    amount > 0 &&
+    currentAccount.movElement.some(mov => mov >= amount * 0.1)
+  ) {
+    //Add movement
+    currentAccount.movements.push(amount);
+    //Update UI
+    updateUi(currentAccount);
+  }
+  inputLoanAmount.value = '';
+});
+
 btnClose.addEventListener('click', function (e) {
   e.preventDefault();
   if (
@@ -203,4 +222,10 @@ btnClose.addEventListener('click', function (e) {
     containerApp.style.opacity = 0;
   }
   inputCloseUsername.value = inputClosePin.value = '';
+});
+let sorted = false;
+btnSort.addEventListener('click', function (e) {
+  e.preventDefault();
+  displayTransfers(currentAccount.movements, !sorted);
+  sorted = !sorted;
 });
