@@ -61,16 +61,49 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-// LECTURES
+//funcion to display all the transfers
+const displayTransfers = function (movements) {
+  containerMovements.innerHTML = '';
+  movements.forEach(function (mov, i) {
+    const type = mov > 0 ? 'deposit' : 'withdrawal';
+    const movElement = `
+    <div class="movements__row">
+          <div class="movements__type movements__type--${type}">${
+      i + 1
+    } ${type}</div>
+          <div class="movements__date">3 days ago</div>
+          <div class="movements__value">${mov}€</div>
+    </div>
+    `;
+    containerMovements.insertAdjacentHTML('afterbegin', movElement);
+  });
+};
 
-const currencies = new Map([
-  ['USD', 'United States dollar'],
-  ['EUR', 'Euro'],
-  ['GBP', 'Pound sterling'],
-]);
+displayTransfers(account1.movements);
 
-const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+//function to calculater total balance and display it
+const calcAndPrintBalance = function (movements) {
+  const balance = movements.reduce(function (total, val) {
+    return total + val;
+  }, 0);
+  labelBalance.textContent = `${balance}euro`;
+};
 
-/////////////////////////////////////////////////
+calcAndPrintBalance(account1.movements);
+
+//function to generate a usernam from the full name
+//How to mutate????
+const generateUsername = function (accnts) {
+  accnts.forEach(function (accnt) {
+    accnt.usernme = accnt.owner
+      .toLowerCase()
+      .split(' ')
+      .map(value => {
+        return value[0];
+      })
+      .join('');
+  });
+};
+generateUsername(accounts);
+
+console.log(accounts);
